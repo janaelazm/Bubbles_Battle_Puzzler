@@ -15,12 +15,10 @@ public class Tile : MonoBehaviour
     void OnMouseEnter()
     {
         highlight.SetActive(true);
-        Debug.Log("HOVERING");
     }
 
     void OnMouseExit()
     {
         highlight.SetActive(false);
-         Debug.Log("BYE");
     }
 }
