@@ -1,25 +1,22 @@
+using TMPro;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 
 public class NetworkUI : MonoBehaviour
 {
-    [SerializeField] private string hostIP;
-    [SerializeField] private ushort port;
+    [SerializeField] private TMP_InputField joinCodeInput;
 
-    void Awake()
-    {
-        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        transport.SetConnectionData(hostIP, port);
-    }
+    public RelayManager relayManager;
 
     public void StartHost()
     {
-        NetworkManager.Singleton.StartHost();
+        relayManager.StartHost();
     }
 
     public void StartClient()
     {
-        NetworkManager.Singleton.StartClient();
+        string code = joinCodeInput.text;
+        Debug.Log("joinging game:" + code);
+        relayManager.StartClient(code);
     }
 }
