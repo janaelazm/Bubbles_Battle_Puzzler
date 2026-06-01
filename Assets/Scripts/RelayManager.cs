@@ -10,8 +10,6 @@ public class RelayManager : MonoBehaviour
     {
         try
         {
-            Debug.Log("StartHost called");
-
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(4);
 
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
