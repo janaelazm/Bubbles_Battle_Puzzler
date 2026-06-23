@@ -1,25 +1,39 @@
+using TMPro;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
+using Unity.VisualScripting;
+using System;
+using System.Threading.Tasks;
+using WebSocketSharp;
 
 public class NetworkUI : MonoBehaviour
 {
-    [SerializeField] private string hostIP;
-    [SerializeField] private ushort port;
+    [SerializeField] private TMP_InputField joinCodeInput;
+    [SerializeField] private TMP_Text roomCode;
+
+    [SerializeField] private RelayManager relayManager;
 
     void Awake()
     {
-        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        transport.SetConnectionData(hostIP, port);
+        roomCode.gameObject.SetActive(false);
     }
 
-    public void StartHost()
+    public async void StartHost()
     {
-        NetworkManager.Singleton.StartHost();
+        roomCode.text = "Generating Code...";
+        roomCode.gameObject.SetActive(true);
+        await relayManager.StartHost();
+        roomCode.text = "Room Code: " + relayManager.joinCode;
     }
 
-    public void StartClient()
+    public async void StartClient()
     {
-        NetworkManager.Singleton.StartClient();
+        roomCode.text = "Joining Room...";
+        string code = joinCodeInput.text;
+        if(code.IsNullOrEmpty())
+            return;
+        await relayManager.StartClient(code);
+        roomCode.gameObject.SetActive(true);
+        roomCode.text = "Room Code: " + code;
     }
 }
