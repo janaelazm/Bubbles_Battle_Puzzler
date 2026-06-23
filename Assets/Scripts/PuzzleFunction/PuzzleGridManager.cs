@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PuzzleGridManager : MonoBehaviour
@@ -6,11 +7,13 @@ public class PuzzleGridManager : MonoBehaviour
     public int width = 8;
     public int height = 8;
     public float cellSize = 1f;
+    public Vector2Int gridOffset = new Vector2Int(-4, 0);
 
     [Header("Prefabs")]
     public GameObject cellPrefab;
 
     private Cell[,] cells;
+    private readonly List<Cell> currentHoverCells = new();
 
     private void Awake()
     {
@@ -43,8 +46,8 @@ public class PuzzleGridManager : MonoBehaviour
 
     public Vector2Int WorldToGrid(Vector3 worldPosition)
     {
-        int x = Mathf.RoundToInt(worldPosition.x / cellSize);
-        int y = Mathf.RoundToInt(worldPosition.y / cellSize);
+        int x = Mathf.RoundToInt(worldPosition.x / cellSize) - gridOffset.x;
+        int y = Mathf.RoundToInt(worldPosition.y / cellSize) - gridOffset.y;
 
         return new Vector2Int(x, y);
     }
@@ -52,10 +55,24 @@ public class PuzzleGridManager : MonoBehaviour
     public Vector3 GridToWorld(Vector2Int gridPosition)
     {
         return new Vector3(
-            gridPosition.x * cellSize,
-            gridPosition.y * cellSize,
+            (gridPosition.x + gridOffset.x) * cellSize,
+            (gridPosition.y + gridOffset.y) * cellSize,
             -0.1f
         );
+    }
+
+    public void ApplyModifier(LevelModifier modifier)
+    {
+        if (modifier == null)
+            return;
+
+        if (modifier.type == LevelModifierType.FixedStartingPiece)
+        {
+            TryPlacePiece(
+                modifier.fixedPiecePrefab,
+                GridToWorld(modifier.fixedPiecePosition)
+            );
+        }
     }
 
     public bool IsInsideGrid(Vector2Int gridPosition)
@@ -66,55 +83,91 @@ public class PuzzleGridManager : MonoBehaviour
                gridPosition.y < height;
     }
 
-    public bool CanPlaceAt(Vector2Int gridPosition)
+    public bool CanPlaceAt(Piece piece, Vector2Int gridPosition)
     {
-        if (!IsInsideGrid(gridPosition))
-            return false;
+        foreach (Vector2Int offset in piece.GetRotatedShape())
+        {
+            Vector2Int cellPosition = gridPosition + offset;
 
-        return !cells[gridPosition.x, gridPosition.y].IsOccupied;
-    }
+            if (!IsInsideGrid(cellPosition))
+                return false;
 
-    public bool TryPlacePiece(Piece piece, Vector3 worldPosition)
-    {
-        Vector2Int gridPosition = WorldToGrid(worldPosition);
-
-        if (!CanPlaceAt(gridPosition))
-            return false;
-
-        Cell cell = cells[gridPosition.x, gridPosition.y];
-
-        cell.SetOccupied(true);
-        piece.Place(cell.transform.position);
+            if (cells[cellPosition.x, cellPosition.y].IsOccupied)
+                return false;
+        }
 
         return true;
     }
 
-    private Cell currentHoverCell;
+    public bool TryPlacePiece(Piece piece, Vector3 worldPosition)
+    {
+        
+        Vector2Int origin = WorldToGrid(worldPosition);
 
-    public void UpdateHover(Vector3 worldPosition)
+        if (!CanPlaceAt(piece, origin))
+            return false;
+
+        foreach (Vector2Int offset in piece.GetRotatedShape())
+        {
+            Vector2Int cellPosition = origin + offset;
+            cells[cellPosition.x, cellPosition.y].SetOccupied(true);
+        }
+
+        Vector3 snapPosition = GridToWorld(origin);
+        snapPosition.z = piece.transform.position.z;
+
+        piece.Place(snapPosition);
+
+        if (IsComplete())
+        {
+            Debug.Log("Level complete!");
+        }
+
+        return true;
+    }
+
+    public void UpdateHover(Piece piece, Vector3 worldPosition)
     {
         ClearHover();
 
-        Vector2Int gridPosition = WorldToGrid(worldPosition);
+        Vector2Int origin = WorldToGrid(worldPosition);
 
-        if (!IsInsideGrid(gridPosition))
+        if (!CanPlaceAt(piece, origin))
             return;
 
-        Cell cell = cells[gridPosition.x, gridPosition.y];
+        foreach (Vector2Int offset in piece.GetRotatedShape())
+        {
+            Vector2Int cellPosition = origin + offset;
+            Cell cell = cells[cellPosition.x, cellPosition.y];
 
-        if (cell.IsOccupied)
-            return;
-
-        currentHoverCell = cell;
-        currentHoverCell.SetHover(true);
+            cell.SetHover(true);
+            currentHoverCells.Add(cell);
+        }
     }
 
     public void ClearHover()
     {
-        if (currentHoverCell == null)
-            return;
+        foreach (Cell cell in currentHoverCells)
+        {
+            cell.SetHover(false);
+        }
 
-        currentHoverCell.SetHover(false);
-        currentHoverCell = null;
+        currentHoverCells.Clear();
+    }
+
+    public bool IsComplete()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (!cells[x, y].IsOccupied)
+                    return false;
+            }
+        }
+
+        Debug.Log("Puzzle complete!");
+        // Back to Pathchoosing
+        return true;
     }
 }

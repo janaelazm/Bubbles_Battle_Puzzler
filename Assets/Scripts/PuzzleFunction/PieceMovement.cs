@@ -22,7 +22,7 @@ public class PieceMovement : MonoBehaviour
 
         Vector3 mousePosition = GetMouseWorldPosition();
         transform.position = mousePosition + offset;
-        gridManager.UpdateHover(transform.position);
+        gridManager.UpdateHover(piece, transform.position);
     }
 
     private void OnMouseDown()
