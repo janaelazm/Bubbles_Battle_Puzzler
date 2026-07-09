@@ -15,9 +15,17 @@ public class PuzzleGridManager : MonoBehaviour
     private Cell[,] cells;
     private readonly List<Cell> currentHoverCells = new();
 
+    [Header("Score Settings")]
+    [SerializeField] private int nodeBasePoints = 10;
+
+    private bool levelCompleted = false;
+    private LevelManager levelManager;
+
+
     private void Awake()
     {
         cells = new Cell[width, height];
+        levelManager = FindFirstObjectByType<LevelManager>();
         GenerateGrid();
     }
 
@@ -118,9 +126,24 @@ public class PuzzleGridManager : MonoBehaviour
 
         piece.Place(snapPosition);
 
-        if (IsComplete())
+        if (!levelCompleted && IsComplete())
         {
-            Debug.Log("Level complete!");
+            levelCompleted = true;
+
+            LevelModifier activeModifier = null;
+
+            if (levelManager != null)
+            {
+                activeModifier = levelManager.GetActiveModifier();
+            }
+
+            int perkBonus = ScoreManager.Instance.GetModifierBonus(activeModifier);
+            int totalPoints = nodeBasePoints + perkBonus;
+
+
+            ScoreManager.Instance.AddPoints(totalPoints);
+
+            Debug.Log($"Level complete! Base: {nodeBasePoints}, Perk Bonus: {perkBonus}, Total: {totalPoints}");
         }
 
         return true;

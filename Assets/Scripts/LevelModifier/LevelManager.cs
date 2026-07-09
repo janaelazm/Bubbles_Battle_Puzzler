@@ -29,4 +29,9 @@ public class LevelManager : MonoBehaviour
 
         Debug.Log($"Level Modifier: {activeModifier.displayName}");
     }
+
+    public LevelModifier GetActiveModifier()
+    {
+        return activeModifier;
+    }
 }
