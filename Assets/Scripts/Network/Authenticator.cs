@@ -6,19 +6,8 @@ using UnityEngine;
 
 public class Authenticator : MonoBehaviour
 {
-    public static Authenticator Instance;
-
-    private async void Awake()
+    public async Task Init()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         try
         {
             Debug.Log("Initializing Unity Services...");
@@ -41,12 +30,17 @@ public class Authenticator : MonoBehaviour
     {
         AuthenticationService.Instance.SignedIn += () =>
         {
-            Debug.Log("Signed in event fired");
+            Debug.Log("Signed in");
         };
 
         AuthenticationService.Instance.SignInFailed += (err) =>
         {
             Debug.LogError(err);
         };
+    }
+
+    public string GetPlayerId()
+    {
+        return AuthenticationService.Instance.PlayerId;
     }
 }

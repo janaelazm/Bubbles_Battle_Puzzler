@@ -7,14 +7,13 @@ using System;
 using System.Threading.Tasks;
 public class RelayManager : MonoBehaviour
 {
-    public string joinCode;
-    public async Task StartHost()
+    public async Task<string> StartHost()
     {
         try
         {
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(4);
 
-            joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             Debug.Log("JOIN CODE: " + joinCode);
             var transport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -30,28 +29,37 @@ public class RelayManager : MonoBehaviour
             NetworkManager.Singleton.StartHost();
 
             Debug.Log("Host started");
+            return joinCode;
         }
         catch (Exception e)
         {
             Debug.LogException(e);
+            throw;
         }
     }
 
     public async Task StartClient(string joinCode)
     {
-        JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode.Trim());
+        try{
+            JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode.Trim());
 
-        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
-        transport.SetClientRelayData(
-            allocation.RelayServer.IpV4,
-            (ushort)allocation.RelayServer.Port,
-            allocation.AllocationIdBytes,
-            allocation.Key,
-            allocation.ConnectionData,
-            allocation.HostConnectionData
-        );
+            transport.SetClientRelayData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData,
+                allocation.HostConnectionData
+            );
 
-        NetworkManager.Singleton.StartClient();
+            NetworkManager.Singleton.StartClient();
+        }
+        catch(Exception e)
+        {
+            Debug.LogException(e);
+            throw;
+        }
     }
 }
