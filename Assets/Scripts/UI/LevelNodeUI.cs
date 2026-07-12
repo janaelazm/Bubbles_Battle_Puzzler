@@ -44,6 +44,9 @@ public class LevelNodeUI : MonoBehaviour
             return;
         }
 
+        if(nodeData.State == LevelState.Completed || nodeData.State == LevelState.Occupied)
+            return ;
+
         GameStateManager.Instance.OccupyLevel(
             nodeData.LevelID,
             PlayerProfile.Instance.PlayerColor
