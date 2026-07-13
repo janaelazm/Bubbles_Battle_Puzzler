@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PuzzleGridManager : MonoBehaviour
 {
@@ -8,6 +10,10 @@ public class PuzzleGridManager : MonoBehaviour
     public int height = 8;
     public float cellSize = 1f;
     public Vector2Int gridOffset = new Vector2Int(-4, 0);
+
+    [Header("Level Node Details")]
+    public int levelID;
+
 
     [Header("Prefabs")]
     public GameObject cellPrefab;
@@ -27,6 +33,11 @@ public class PuzzleGridManager : MonoBehaviour
         cells = new Cell[width, height];
         levelManager = FindFirstObjectByType<LevelManager>();
         GenerateGrid();
+    }
+
+    void Start()
+    {
+        levelID = LevelTransferData.SelectedLevelID;
     }
 
     private void GenerateGrid()
@@ -144,6 +155,8 @@ public class PuzzleGridManager : MonoBehaviour
             ScoreManager.Instance.AddPoints(totalPoints);
 
             Debug.Log($"Level complete! Base: {nodeBasePoints}, Perk Bonus: {perkBonus}, Total: {totalPoints}");
+            GameStateManager.Instance.CompleteLevel(levelID, PlayerProfile.Instance.PlayerColor);
+            SceneManager.LoadScene("PathSelection");
         }
 
         return true;
@@ -193,4 +206,12 @@ public class PuzzleGridManager : MonoBehaviour
         // Back to Pathchoosing
         return true;
     }
+
+    public void InstantCompleteLevel()
+    {
+        Debug.Log("Level complete!");
+        GameStateManager.Instance.CompleteLevel(levelID, PlayerProfile.Instance.PlayerColor);
+        SceneManager.LoadScene("PathSelection");
+    }
+
 }
