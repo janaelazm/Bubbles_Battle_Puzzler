@@ -48,14 +48,28 @@ public class PathManager : MonoBehaviour
 
         for (int floor = 1; floor <= 3; floor++)
         {
-            CreateNode(id++, floor, LevelDifficulty.Easy, Color.green);
-            CreateNode(id++, floor, LevelDifficulty.Medium, Color.yellow);
-            CreateNode(id++, floor, LevelDifficulty.Hard, Color.red);
+            CreateNode(id++, floor, LevelDifficulty.Easy, new Color(
+                78f / 255f,
+                242f / 255f,
+                163f / 255f,
+                1f
+            ));
+            CreateNode(id++, floor, LevelDifficulty.Medium, new Color(
+                237f / 255f,
+                225f / 255f,
+                116f / 255f,
+                1f
+            ));
+            CreateNode(id++, floor, LevelDifficulty.Hard, new Color(
+                214f / 255f,
+                81f / 255f,
+                132f / 255f,
+                1f
+            ));
+        
         }
-
         CreateNode(10, 4, LevelDifficulty.Placeholder, Color.gray);
     }
-
 
     private void CreateNode(int id, int floor, LevelDifficulty difficulty, Color color)
     {
