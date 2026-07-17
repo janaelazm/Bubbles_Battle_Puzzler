@@ -1,14 +1,23 @@
+# =========================
+# Unity generated folders
+# =========================
+
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
+[Bb]uild/
+[Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
+
+
+# =========================
+# IDE files
+# =========================
 
 .vscode/
 .idea/
 .gradle/
-
-UserSettings/
 
 *.csproj
 *.unityproj
@@ -19,3 +28,34 @@ UserSettings/
 *.userprefs
 *.pidb
 *.booproj
+
+
+# =========================
+# Unity user settings
+# =========================
+
+UserSettings/
+
+
+# =========================
+# OS files
+# =========================
+
+.DS_Store
+Thumbs.db
+
+
+# =========================
+# Crash reports
+# =========================
+
+sysinfo.txt
+
+
+# =========================
+# Temporary files
+# =========================
+
+*.pid
+*.log
+*.bak

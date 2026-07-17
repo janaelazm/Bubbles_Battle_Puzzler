@@ -9,6 +9,9 @@ public class PieceSpawner : MonoBehaviour
     [Header("Spawn Points")]
     [SerializeField] private Transform[] spawnPoints;
 
+    [Header("Grid")]
+    [SerializeField] private PuzzleGridManager gridManager;
+
     [Header("Timing")]
     [SerializeField] private float respawnTime = 10f;
 
@@ -52,12 +55,14 @@ public class PieceSpawner : MonoBehaviour
         else if (AreAllCurrentPiecesPlaced())
         {
             SpawnNewPieces();
-            timer = respawnTime;
+            timer = GetRespawnTime();
         }
     }
 
     private void SpawnNewPieces()
     {
+        currentPieces.Clear();
+
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             Piece prefab = GetRandomPiecePrefab();
@@ -68,8 +73,11 @@ public class PieceSpawner : MonoBehaviour
                 Quaternion.identity
             );
 
+            spawnedPiece.transform.localScale =
+                Vector3.one * gridManager.CellSize;
+
             spawnedPiece.SetRandomRotation();
-            // Debug.Log($"{spawnedPiece.name} rotation: {spawnedPiece.transform.eulerAngles.z}");
+
             currentPieces.Add(spawnedPiece);
         }
     }

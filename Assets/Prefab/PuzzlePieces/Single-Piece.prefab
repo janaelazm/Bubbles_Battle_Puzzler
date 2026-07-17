@@ -76,8 +76,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Piece
   shape:
   - {x: 0, y: 0}
-  categories: 16
-  spawnWeight: 1
+  categories: 
+  spawnWeight: 5
 --- !u!114 &4376895912628414757
 MonoBehaviour:
   m_ObjectHideFlags: 0
