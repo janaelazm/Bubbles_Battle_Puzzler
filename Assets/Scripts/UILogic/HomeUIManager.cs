@@ -3,77 +3,167 @@ using TMPro;
 
 public class HomeUIManager : MonoBehaviour
 {
-    [Header("Panels")]
+    [Header("Main Panels")]
     public GameObject homePanel;
+    public GameObject pathSelectionPanel;
     public GameObject gamePanel;
-    public GameObject difficultyPanel;
     public GameObject profilePanel;
 
-    [Header("Profile")]
-    public TMP_Text profileNameText;
-    public TMP_Text selectedDifficultyText;
+    [Header("Popup")]
+    public GameObject quitPopup;
 
-    private string selectedDifficulty = "Leicht";
+    [Header("Profile Inputs")]
+    public TMP_InputField firstNameInput;
+    public TMP_InputField lastNameInput;
+    public TMP_Text profileNameText;
+    public TMP_Text profileConfirmationText;
+
+    [Header("Path Page")]
+    public TMP_Text pathPlayerInfoText;
+
+    private string firstName = "Marie";
+    private string lastName = "Muller";
 
     void Start()
     {
+        LoadProfile();
         ShowHome();
 
-        profileNameText.text = "Name: Muller\nVorname: Marie";
-        selectedDifficultyText.text = "Level: " + selectedDifficulty;
+        if (quitPopup != null)
+            quitPopup.SetActive(false);
+    }
+
+    private void HideAllMainPanels()
+    {
+        if (homePanel != null)
+            homePanel.SetActive(false);
+
+        if (pathSelectionPanel != null)
+            pathSelectionPanel.SetActive(false);
+
+        if (gamePanel != null)
+            gamePanel.SetActive(false);
+
+        if (profilePanel != null)
+            profilePanel.SetActive(false);
     }
 
     public void ShowHome()
     {
-        homePanel.SetActive(true);
-        gamePanel.SetActive(false);
-        difficultyPanel.SetActive(false);
-        profilePanel.SetActive(false);
+        HideAllMainPanels();
+
+        if (homePanel != null)
+            homePanel.SetActive(true);
     }
 
-    public void PlayGame()
+    public void ShowPathSelection()
     {
-        homePanel.SetActive(false);
-        gamePanel.SetActive(true);
-        difficultyPanel.SetActive(false);
-        profilePanel.SetActive(false);
+        HideAllMainPanels();
+
+        if (pathSelectionPanel != null)
+            pathSelectionPanel.SetActive(true);
+
+        UpdatePathPlayerInfo();
     }
 
-    public void ShowDifficulty()
+    public void StartGame()
     {
-        homePanel.SetActive(false);
-        difficultyPanel.SetActive(true);
+        HideAllMainPanels();
+
+        if (gamePanel != null)
+            gamePanel.SetActive(true);
     }
 
     public void ShowProfile()
     {
-        homePanel.SetActive(false);
-        profilePanel.SetActive(true);
+        HideAllMainPanels();
+
+        if (profilePanel != null)
+            profilePanel.SetActive(true);
+
+        if (firstNameInput != null)
+            firstNameInput.text = firstName;
+
+        if (lastNameInput != null)
+            lastNameInput.text = lastName;
+
+        if (profileConfirmationText != null)
+            profileConfirmationText.text = "";
     }
 
-    public void SetDifficultyEasy()
+    public void SaveProfile()
     {
-        selectedDifficulty = "Leicht 🟢";
-        selectedDifficultyText.text = "Level: " + selectedDifficulty;
-        ShowHome();
+        if (firstNameInput != null)
+            firstName = firstNameInput.text.Trim();
+
+        if (lastNameInput != null)
+            lastName = lastNameInput.text.Trim();
+
+        if (string.IsNullOrWhiteSpace(firstName))
+            firstName = "Spieler";
+
+        if (string.IsNullOrWhiteSpace(lastName))
+            lastName = "";
+
+        PlayerPrefs.SetString("FirstName", firstName);
+        PlayerPrefs.SetString("LastName", lastName);
+        PlayerPrefs.Save();
+
+        UpdateProfileTexts();
+
+        if (profileConfirmationText != null)
+            profileConfirmationText.text = "Profil gespeichert!";
     }
 
-    public void SetDifficultyMedium()
+    private void LoadProfile()
     {
-        selectedDifficulty = "Mittel 🟡";
-        selectedDifficultyText.text = "Level: " + selectedDifficulty;
-        ShowHome();
+        firstName = PlayerPrefs.GetString("FirstName", "Marie");
+        lastName = PlayerPrefs.GetString("LastName", "Muller");
+
+        UpdateProfileTexts();
     }
 
-    public void SetDifficultyHard()
+    private void UpdateProfileTexts()
     {
-        selectedDifficulty = "Schwer 🔴";
-        selectedDifficultyText.text = "Level: " + selectedDifficulty;
-        ShowHome();
+        if (profileNameText != null)
+        {
+            profileNameText.text =
+                $"Name: {lastName}\nVorname: {firstName}";
+        }
+
+        UpdatePathPlayerInfo();
     }
 
-    public void QuitGame()
+    private void UpdatePathPlayerInfo()
     {
+        if (pathPlayerInfoText != null)
+        {
+            pathPlayerInfoText.text =
+                $"Spieler: {firstName} {lastName}\n" +
+                "Aktuelles Level: 1";
+        }
+    }
+
+    public void OpenQuitPopup()
+    {
+        if (quitPopup != null)
+            quitPopup.SetActive(true);
+    }
+
+    public void CloseQuitPopup()
+    {
+        if (quitPopup != null)
+            quitPopup.SetActive(false);
+    }
+
+    public void ConfirmQuit()
+    {
+        Debug.Log("Spiel wird beendet.");
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
         Application.Quit();
+#endif
     }
 }
