@@ -96,6 +96,7 @@ public class LevelNodeUI : MonoBehaviour
 
         LevelTransferData.SelectedLevelID = nodeData.LevelID;
         LevelTransferData.SelectedDifficulty = nodeData.Difficulty;
+        LevelTransferData.SelectedModifier = nodeData.Modifier;
 
         SceneManager.LoadScene(nodeData.LevelName);
     }

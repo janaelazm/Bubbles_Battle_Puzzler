@@ -83,23 +83,7 @@ public class ScoreManager : MonoBehaviour
 
     public int GetModifierBonus(LevelModifier modifier)
     {
-        if (modifier == null)
-            return 0;
-
-        switch (modifier.type)
-        {
-            case LevelModifierType.FasterPieceSwap:
-                return 5;
-
-            case LevelModifierType.PieceCategoryBias:
-                return 3;
-
-            case LevelModifierType.FixedStartingPiece:
-                return 5;
-
-            default:
-                return 0;
-        }
+        return modifier == null ? 0 : modifier.scoreBonus;
     }
 
 

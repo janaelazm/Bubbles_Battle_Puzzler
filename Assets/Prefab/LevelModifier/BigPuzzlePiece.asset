@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 429de2a136ed8ee4cba15226fc272e16, type: 3}
-  m_Name: WeirdPuzzlePieces
+  m_Name: BigPuzzlePiece
   m_EditorClassIdentifier: Assembly-CSharp::LevelModifier
-  displayName: More complex Puzzlepieces
+  displayName: Big Pieces
   type: 1
-  scoreBonus: 5
-  preferredCategories: 0800000020000000
-  categoryMultiplier: 8
+  scoreBonus: 6
+  preferredCategories: 04000000
+  categoryMultiplier: 4
   swapTime: 10
   fixedPiecePrefab: {fileID: 0}
   fixedPiecePosition: {x: 0, y: 0}

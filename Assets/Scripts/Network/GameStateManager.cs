@@ -11,6 +11,8 @@ public struct PlayerScoreEntry :
     public ulong ClientId;
     public int Score;
 
+
+
     public PlayerScoreEntry(ulong clientId, int score)
     {
         ClientId = clientId;
@@ -52,6 +54,9 @@ public class GameStateManager : NetworkBehaviour
     private GameObject gameEndUIInstance;
 
     public NetworkList<PlayerScoreEntry> PlayerScores = new NetworkList<PlayerScoreEntry>();
+    public NetworkList<int> levelModifierIndices = new NetworkList<int>();
+
+    public event Action OnLevelModifiersChanged;
 
     public NetworkVariable<bool> IsDraw = new NetworkVariable<bool>(false);
 
@@ -70,9 +75,10 @@ public class GameStateManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        //whenever level states change call OnsStateChanged function
         levelStates.OnListChanged += OnStateChanged;
         levelColors.OnListChanged += OnColorChanged;
+        levelModifierIndices.OnListChanged += OnModifierIndexChanged;
+
         GameEnded.OnValueChanged += OnGameEnded;
 
         if (ScoreManager.Instance != null)
@@ -80,10 +86,21 @@ public class GameStateManager : NetworkBehaviour
             SetLocalScore(ScoreManager.Instance.CurrentScore);
         }
 
+        if (levelModifierIndices.Count > 0)
+        {
+            OnLevelModifiersChanged?.Invoke();
+        }
+    }
+
+    private void OnModifierIndexChanged(
+    NetworkListEvent<int> changeEvent)
+    {
+        OnLevelModifiersChanged?.Invoke();
     }
 
 
     private void OnStateChanged(NetworkListEvent<byte> changeEvent)
+
     {
         Color color = Color.white;
 
@@ -199,6 +216,8 @@ public class GameStateManager : NetworkBehaviour
     {
         levelStates.OnListChanged -= OnStateChanged;
         levelColors.OnListChanged -= OnColorChanged;
+        levelModifierIndices.OnListChanged -= OnModifierIndexChanged;
+
         GameEnded.OnValueChanged -= OnGameEnded;
     }
 
@@ -489,4 +508,83 @@ public class GameStateManager : NetworkBehaviour
         opponentScore = 0;
         return false;
     }
+
+    public bool HasLevelModifiers(int expectedCount)
+    {
+        return levelModifierIndices.Count == expectedCount;
+    }
+
+
+    public int GetLevelModifierIndex(int levelID)
+    {
+        if (levelID < 0 ||
+            levelID >= levelModifierIndices.Count)
+        {
+            return -1;
+        }
+
+        return levelModifierIndices[levelID];
+    }
+
+
+    public void InitializeLevelModifiers(
+    IReadOnlyList<int> modifierIndices)
+    {
+        if (!IsServer)
+        {
+            Debug.LogWarning(
+                "Only the server can initialize level modifiers."
+            );
+
+            return;
+        }
+
+        if (modifierIndices == null ||
+            modifierIndices.Count == 0)
+        {
+            Debug.LogError(
+                "Cannot initialize an empty modifier list."
+            );
+
+            return;
+        }
+
+       
+        if (levelModifierIndices.Count ==
+            modifierIndices.Count)
+        {
+            Debug.Log(
+                "Synchronized level modifiers already exist."
+            );
+
+            return;
+        }
+
+      
+        levelModifierIndices.Clear();
+
+        for (int i = 0; i < modifierIndices.Count; i++)
+        {
+            levelModifierIndices.Add(modifierIndices[i]);
+        }
+
+        Debug.Log(
+            $"Server initialized {levelModifierIndices.Count} " +
+            "synchronized modifier indices."
+        );
+    }
+
+
+    public void ResetLevelModifiers()
+    {
+        if (!IsServer)
+            return;
+
+        levelModifierIndices.Clear();
+
+        Debug.Log(
+            "Server reset synchronized level modifiers."
+        );
+    }
+
 }

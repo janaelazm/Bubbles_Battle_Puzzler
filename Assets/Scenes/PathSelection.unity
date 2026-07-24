@@ -2480,6 +2480,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PathManager
   levels: []
+  easyModifiers:
+  - {fileID: 11400000, guid: 10b2034c507efd541931a3d96f8946b1, type: 2}
+  - {fileID: 11400000, guid: 5bbe620f3cee9e94caf8d1ce73344671, type: 2}
+  - {fileID: 11400000, guid: ba758d050730ad24199177e3901bfca7, type: 2}
+  - {fileID: 11400000, guid: b5a12e489692a47429420d683d1d79d2, type: 2}
+  mediumModifiers:
+  - {fileID: 11400000, guid: 74bf0208aa84e7948b7a678fbc828692, type: 2}
+  - {fileID: 11400000, guid: cdaa1863f5e484c4e994f857ca48d935, type: 2}
+  - {fileID: 11400000, guid: 087fb73e90c7d324a8412be849abc6a7, type: 2}
+  - {fileID: 11400000, guid: 8ff034e801b76074bafd43373da48101, type: 2}
+  hardModifiers:
+  - {fileID: 11400000, guid: 66e203fe0bef5c94fb472218443d2bef, type: 2}
+  - {fileID: 11400000, guid: 883eeb831ecf233479623076d260c8b3, type: 2}
+  - {fileID: 11400000, guid: e9f23cd04d71d9e4599a04d3bb57a488, type: 2}
+  - {fileID: 11400000, guid: 9c90221ce9215874a99cbbc751af2c87, type: 2}
 --- !u!224 &1186812243 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7306433198882058851, guid: 65e459640367a4b41a1b986cfbe69106, type: 3}
