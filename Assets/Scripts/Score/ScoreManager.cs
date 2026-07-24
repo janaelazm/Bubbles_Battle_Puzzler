@@ -16,9 +16,9 @@ public class ScoreManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            OnScoreChanged?.Invoke(currentScore);
+            DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
         }
@@ -28,25 +28,57 @@ public class ScoreManager : MonoBehaviour
     {
         currentScore = 0;
         OnScoreChanged?.Invoke(currentScore);
+        NotifyGameStateManager();
+
         Debug.Log($"Score reset : {currentScore}");
     }
 
     public void AddPoints(int amount)
     {
+        if (amount <= 0)
+            return;
+
         currentScore += amount;
+
         OnScoreChanged?.Invoke(currentScore);
+        NotifyGameStateManager();
+
         Debug.Log($"+{amount} Punkte | Score = {currentScore}");
     }
 
     public void RemovePoints(int amount)
     {
-        currentScore -= amount;
+        if (amount <= 0)
+            return;
 
-        if (currentScore < 0)
-            currentScore = 0;
+        currentScore -= amount;
+        currentScore = Mathf.Max(0, currentScore);
 
         OnScoreChanged?.Invoke(currentScore);
+        NotifyGameStateManager();
+
         Debug.Log($"-{amount} Punkte | Score = {currentScore}");
+    }
+
+    public int GetBasePoints(LevelDifficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case LevelDifficulty.Easy:
+                return 10;
+
+            case LevelDifficulty.Medium:
+                return 20;
+
+            case LevelDifficulty.Hard:
+                return 35;
+
+            default:
+                Debug.LogWarning(
+                    $"No score configured for difficulty: {difficulty}"
+                );
+                return 0;
+        }
     }
 
     public int GetModifierBonus(LevelModifier modifier)
@@ -68,5 +100,21 @@ public class ScoreManager : MonoBehaviour
             default:
                 return 0;
         }
+    }
+
+
+    private void NotifyGameStateManager()
+    {
+        if (GameStateManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "GameStateManager not available yet. " +
+                "The score remains stored locally."
+            );
+
+            return;
+        }
+
+        GameStateManager.Instance.SetLocalScore(currentScore);
     }
 }

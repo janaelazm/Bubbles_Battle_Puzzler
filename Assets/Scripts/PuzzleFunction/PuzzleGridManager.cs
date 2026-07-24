@@ -21,8 +21,6 @@ public class PuzzleGridManager : MonoBehaviour
     private Cell[,] cells;
     private readonly List<Cell> currentHoverCells = new();
 
-    [Header("Score Settings")]
-    [SerializeField] private int nodeBasePoints = 10;
 
     private bool levelCompleted = false;
     private LevelManager levelManager;
@@ -173,7 +171,7 @@ public class PuzzleGridManager : MonoBehaviour
 
         if (!levelCompleted && IsComplete())
         {
-            levelCompleted = true;
+           
 
             LevelModifier activeModifier = null;
 
@@ -182,15 +180,39 @@ public class PuzzleGridManager : MonoBehaviour
                 activeModifier = levelManager.GetActiveModifier();
             }
 
-            int perkBonus = ScoreManager.Instance.GetModifierBonus(activeModifier);
-            int totalPoints = nodeBasePoints + perkBonus;
+            if (ScoreManager.Instance == null)
+            {
+                Debug.LogError("ScoreManager instance not found.");
+            }
+            else
+            {
+                LevelDifficulty difficulty =
+                    LevelTransferData.SelectedDifficulty;
+
+                int basePoints =
+                    ScoreManager.Instance.GetBasePoints(difficulty);
+
+                int perkBonus =
+                    ScoreManager.Instance.GetModifierBonus(activeModifier);
+
+                int totalPoints = basePoints + perkBonus;
+
+                ScoreManager.Instance.AddPoints(totalPoints);
+
+                Debug.Log(
+                    $"Level complete! " +
+                    $"Difficulty: {difficulty}, " +
+                    $"Base: {basePoints}, " +
+                    $"Perk Bonus: {perkBonus}, " +
+                    $"Total: {totalPoints}"
+                );
+            }
 
 
-            ScoreManager.Instance.AddPoints(totalPoints);
-
-            Debug.Log($"Level complete! Base: {nodeBasePoints}, Perk Bonus: {perkBonus}, Total: {totalPoints}");
-
-             CompleteLevel();
+            if (IsComplete())
+            {
+                FinishLevel();
+            }
         }
 
         return true;
@@ -283,6 +305,41 @@ public class PuzzleGridManager : MonoBehaviour
         }
     }
 
+    private void AwardLevelPoints()
+    {
+
+        LevelModifier activeModifier = null;
+
+        if (levelManager != null)
+        {
+            activeModifier = levelManager.GetActiveModifier();
+        }
+
+        if (ScoreManager.Instance == null)
+        {
+            Debug.LogError("ScoreManager instance not found.");
+            return;
+        }
+
+        LevelDifficulty difficulty = LevelTransferData.SelectedDifficulty;
+
+        int basePoints =
+            ScoreManager.Instance.GetBasePoints(difficulty);
+
+        int perkBonus =
+            ScoreManager.Instance.GetModifierBonus(activeModifier);
+
+        int totalPoints = basePoints + perkBonus;
+
+        ScoreManager.Instance.AddPoints(totalPoints);
+
+        Debug.Log(
+            $"Level complete! Difficulty: {difficulty}, " +
+            $"Base: {basePoints}, Perk Bonus: {perkBonus}, " +
+            $"Total: {totalPoints}"
+        );
+    }
+
     private void CompleteLevel()
     {
         Debug.Log("Level complete!");
@@ -297,6 +354,18 @@ public class PuzzleGridManager : MonoBehaviour
 
     public void InstantCompleteLevel()
     {
+        FinishLevel();
+    }
+
+    private void FinishLevel()
+    {
+        if (levelCompleted)
+            return;
+
+       
+        levelCompleted = true;
+
+        AwardLevelPoints();
         CompleteLevel();
     }
 }
