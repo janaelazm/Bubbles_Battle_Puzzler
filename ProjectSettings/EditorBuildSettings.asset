@@ -9,11 +9,23 @@ EditorBuildSettings:
     path: Assets/Scenes/MainScene.unity
     guid: e22754e3bae8f3941881b2d2615da560
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/MainScreen.unity
+    guid: 75aa694d4a6a3864da7d521285386861
+  - enabled: 1
+    path: Assets/Scenes/PathOverview.unity
+    guid: 0e5b53c8dddac314e8001023bad00394
+  - enabled: 1
+    path: Assets/Scenes/Level.unity
+    guid: da07e3ecce0987446819fe4f37cfa665
+  - enabled: 1
+    path: Assets/Scenes/EndScene.unity
+    guid: bbe5f20cc792be946893de3d9d01d44d
   - enabled: 1
     path: Assets/Scenes/PathSelection.unity
     guid: 9518b49a325a6504ca2878a3bc2d1e19
+  - enabled: 1
+    path: Assets/Scenes/SampleScene.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/Scenes/PuzzleScene.unity
     guid: 04cb1750ee2ce2249991ed4d8f460ae2
