@@ -103,7 +103,9 @@ public class LevelNodeUI : MonoBehaviour
 
     public void SetState(LevelState state, Color color)
     {
-        nodeData.State = state;
+        if (nodeData != null)
+            nodeData.State = state;
+            
         switch (state)
         {
 
