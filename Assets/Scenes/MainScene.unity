@@ -620,8 +620,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 16, y: 169.2}
-  m_SizeDelta: {x: 156.97, y: 56.361}
+  m_AnchoredPosition: {x: 16, y: 535}
+  m_SizeDelta: {x: 349.82, y: 176.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &258977600
 MonoBehaviour:
@@ -644,7 +644,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_NormalColor: {r: 0.35978103, g: 0.8340245, b: 0.990566, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -1231,8 +1231,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -65}
-  m_SizeDelta: {x: 528.15, y: 26.3145}
+  m_AnchoredPosition: {x: 0, y: -70.734}
+  m_SizeDelta: {x: 700.8, y: 26.952}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &519420028
 GameObject:
@@ -1941,7 +1941,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 528.145, y: 31.610596}
+  m_SizeDelta: {x: 700.8032, y: 70.7339}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &961903587
 MonoBehaviour:
@@ -3319,7 +3319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1620546683
+  GlobalObjectIdHash: 3197301449
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3546,8 +3546,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
