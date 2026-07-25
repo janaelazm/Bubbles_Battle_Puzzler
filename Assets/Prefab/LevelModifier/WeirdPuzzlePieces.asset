@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelModifier
   displayName: More complex Puzzlepieces
   type: 1
+  scoreBonus: 5
   preferredCategories: 0800000020000000
   categoryMultiplier: 8
   swapTime: 10

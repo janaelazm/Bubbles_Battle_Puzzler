@@ -78,8 +78,8 @@ MonoBehaviour:
   shape:
   - {x: 0, y: 0}
   - {x: 1, y: 0}
-  categories: 16
-  spawnWeight: 1
+  categories: 
+  spawnWeight: 4
 --- !u!114 &-581770494636649954
 MonoBehaviour:
   m_ObjectHideFlags: 0

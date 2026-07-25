@@ -2,31 +2,42 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-    [SerializeField] private LevelModifier[] possibleModifiers;
     [SerializeField] private PieceSpawner pieceSpawner;
 
     private LevelModifier activeModifier;
 
     private void Start()
     {
-        SelectRandomModifier();
+        activeModifier =
+            LevelTransferData.SelectedModifier;
+
+        if (activeModifier == null)
+        {
+            Debug.Log("Level Modifier: None");
+        }
+        else
+        {
+            Debug.Log(
+                $"Level Modifier: " +
+                $"{activeModifier.displayName} | " +
+                $"Bonus: {activeModifier.scoreBonus}"
+            );
+        }
+
+        if (pieceSpawner == null)
+        {
+            Debug.LogError(
+                "PieceSpawner is not assigned."
+            );
+
+            return;
+        }
 
         pieceSpawner.SetModifier(activeModifier);
     }
 
-    private void SelectRandomModifier()
+    public LevelModifier GetActiveModifier()
     {
-        int randomIndex = Random.Range(0, possibleModifiers.Length + 1);
-
-        if (randomIndex == possibleModifiers.Length)
-        {
-            activeModifier = null;
-            Debug.Log("Level Modifier: None");
-            return;
-        }
-
-        activeModifier = possibleModifiers[randomIndex];
-
-        Debug.Log($"Level Modifier: {activeModifier.displayName}");
+        return activeModifier;
     }
 }

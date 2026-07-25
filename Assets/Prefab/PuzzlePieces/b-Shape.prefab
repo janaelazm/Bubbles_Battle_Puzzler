@@ -84,7 +84,7 @@ MonoBehaviour:
   - {x: 0, y: -1}
   - {x: 1, y: -1}
   - {x: 1, y: 0}
-  categories: 4
+  categories: 
   spawnWeight: 1
 --- !u!114 &-4839506917809331281
 MonoBehaviour:
@@ -124,7 +124,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5216536201958590657, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1135106996
+      value: 1465287864
       objectReference: {fileID: 0}
     - target: {fileID: 6080616888116525381, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: m_LocalPosition.x
@@ -202,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5216536201958590657, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2354965380
+      value: 2642503237
       objectReference: {fileID: 0}
     - target: {fileID: 6080616888116525381, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: m_LocalPosition.x
@@ -280,7 +280,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5216536201958590657, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1258036524
+      value: 3875526017
       objectReference: {fileID: 0}
     - target: {fileID: 6080616888116525381, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: m_LocalPosition.x
@@ -358,7 +358,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5216536201958590657, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1451176700
+      value: 3567153837
       objectReference: {fileID: 0}
     - target: {fileID: 6080616888116525381, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: m_LocalPosition.x
@@ -436,7 +436,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5216536201958590657, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 198133023
+      value: 2307795010
       objectReference: {fileID: 0}
     - target: {fileID: 6080616888116525381, guid: c5e7478dea88d354493827fd9b194a63, type: 3}
       propertyPath: m_LocalPosition.x

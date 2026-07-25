@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelModifier
   displayName: Mostly SmallPuzzlePieces
   type: 1
+  scoreBonus: 3
   preferredCategories: 0100000011000000
   categoryMultiplier: 6
   swapTime: 10
