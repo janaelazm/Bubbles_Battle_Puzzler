@@ -59,3 +59,4 @@ sysinfo.txt
 *.pid
 *.log
 *.bak
+.vs/

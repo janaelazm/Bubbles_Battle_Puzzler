@@ -48,10 +48,20 @@ public class Piece : MonoBehaviour
         IsDragging = false;
     }
 
+    public void PickUpFromGrid()
+    {
+        if (!IsPlaced)
+            return;
+
+        IsPlaced = false;
+        IsDragging = true;
+    }
+
     public void ResetToStart()
     {
         transform.position = startPosition;
         IsDragging = false;
+        IsPlaced = false;
     }
 
     public void SetRandomRotation()

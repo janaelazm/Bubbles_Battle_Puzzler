@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelModifier
   displayName: Large + Awkward
   type: 1
+  scoreBonus: 5
   preferredCategories: 0400000024000000
   categoryMultiplier: 6
   swapTime: 10

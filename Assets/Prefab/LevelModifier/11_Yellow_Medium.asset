@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelModifier
   displayName: Many Medium Pieces
   type: 1
+  scoreBonus: 3
   preferredCategories: 02000000
   categoryMultiplier: 4
   swapTime: 10

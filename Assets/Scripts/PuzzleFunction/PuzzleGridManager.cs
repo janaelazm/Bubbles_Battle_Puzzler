@@ -1,43 +1,71 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class PuzzleGridManager : MonoBehaviour
 {
     [Header("Grid Settings")]
-    public int width = 8;
-    public int height = 8;
-    public float cellSize = 1f;
-    public Vector2Int gridOffset = new Vector2Int(-4, 0);
+    [SerializeField] private int width = 8;
+    [SerializeField] private int height = 8;
+    [SerializeField] private BoxCollider2D puzzleArea;
 
     [Header("Level Node Details")]
-    public int levelID;
-
+    [SerializeField] private int levelID;
 
     [Header("Prefabs")]
-    public GameObject cellPrefab;
+    [SerializeField] private GameObject cellPrefab;
+
+    private float cellSize;
+    private Vector2 gridOrigin;
 
     private Cell[,] cells;
     private readonly List<Cell> currentHoverCells = new();
 
-    [Header("Score Settings")]
-    [SerializeField] private int nodeBasePoints = 10;
 
     private bool levelCompleted = false;
     private LevelManager levelManager;
 
 
+    public float CellSize => cellSize;
+
     private void Awake()
     {
+        CalculateGridLayout();
+
         cells = new Cell[width, height];
         levelManager = FindFirstObjectByType<LevelManager>();
         GenerateGrid();
     }
 
-    void Start()
+    private void Start()
     {
         levelID = LevelTransferData.SelectedLevelID;
+    }
+
+    private void CalculateGridLayout()
+    {
+        if (puzzleArea == null)
+        {
+            Debug.LogError("PuzzleArea wurde im PuzzleGridManager nicht zugewiesen.");
+            return;
+        }
+
+        Bounds bounds = puzzleArea.bounds;
+
+        float cellWidth = bounds.size.x / width;
+        float cellHeight = bounds.size.y / height;
+
+        // Verhindert, dass die Zellen gestreckt werden.
+        cellSize = Mathf.Min(cellWidth, cellHeight);
+
+        float gridWidth = width * cellSize;
+        float gridHeight = height * cellSize;
+
+        // Position des Mittelpunkts der linken unteren Zelle.
+        gridOrigin = new Vector2(
+            bounds.center.x - gridWidth / 2f + cellSize / 2f,
+            bounds.center.y - gridHeight / 2f + cellSize / 2f
+        );
     }
 
     private void GenerateGrid()
@@ -46,18 +74,29 @@ public class PuzzleGridManager : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                Vector3 position = GridToWorld(new Vector2Int(x, y));
+                Vector2Int gridPosition = new Vector2Int(x, y);
+                Vector3 worldPosition = GridToWorld(gridPosition);
 
                 GameObject cellObject = Instantiate(
                     cellPrefab,
-                    position,
+                    worldPosition,
                     Quaternion.identity,
                     transform
                 );
 
-                Cell cell = cellObject.GetComponent<Cell>();
-                cell.Init(new Vector2Int(x, y));
+                // Voraussetzung: Das Cell-Prefab ist ursprünglich 1x1 Units groß.
+                cellObject.transform.localScale =
+                    new Vector3(cellSize, cellSize, 1f);
 
+                Cell cell = cellObject.GetComponent<Cell>();
+
+                if (cell == null)
+                {
+                    Debug.LogError("Das Cell-Prefab besitzt kein Cell-Script.");
+                    return;
+                }
+
+                cell.Init(gridPosition);
                 cells[x, y] = cell;
             }
         }
@@ -65,8 +104,13 @@ public class PuzzleGridManager : MonoBehaviour
 
     public Vector2Int WorldToGrid(Vector3 worldPosition)
     {
-        int x = Mathf.RoundToInt(worldPosition.x / cellSize) - gridOffset.x;
-        int y = Mathf.RoundToInt(worldPosition.y / cellSize) - gridOffset.y;
+        int x = Mathf.RoundToInt(
+            (worldPosition.x - gridOrigin.x) / cellSize
+        );
+
+        int y = Mathf.RoundToInt(
+            (worldPosition.y - gridOrigin.y) / cellSize
+        );
 
         return new Vector2Int(x, y);
     }
@@ -74,24 +118,10 @@ public class PuzzleGridManager : MonoBehaviour
     public Vector3 GridToWorld(Vector2Int gridPosition)
     {
         return new Vector3(
-            (gridPosition.x + gridOffset.x) * cellSize,
-            (gridPosition.y + gridOffset.y) * cellSize,
+            gridOrigin.x + gridPosition.x * cellSize,
+            gridOrigin.y + gridPosition.y * cellSize,
             -0.1f
         );
-    }
-
-    public void ApplyModifier(LevelModifier modifier)
-    {
-        if (modifier == null)
-            return;
-
-        if (modifier.type == LevelModifierType.FixedStartingPiece)
-        {
-            TryPlacePiece(
-                modifier.fixedPiecePrefab,
-                GridToWorld(modifier.fixedPiecePosition)
-            );
-        }
     }
 
     public bool IsInsideGrid(Vector2Int gridPosition)
@@ -104,6 +134,9 @@ public class PuzzleGridManager : MonoBehaviour
 
     public bool CanPlaceAt(Piece piece, Vector2Int gridPosition)
     {
+        if (piece == null)
+            return false;
+
         foreach (Vector2Int offset in piece.GetRotatedShape())
         {
             Vector2Int cellPosition = gridPosition + offset;
@@ -120,7 +153,6 @@ public class PuzzleGridManager : MonoBehaviour
 
     public bool TryPlacePiece(Piece piece, Vector3 worldPosition)
     {
-        
         Vector2Int origin = WorldToGrid(worldPosition);
 
         if (!CanPlaceAt(piece, origin))
@@ -139,7 +171,7 @@ public class PuzzleGridManager : MonoBehaviour
 
         if (!levelCompleted && IsComplete())
         {
-            levelCompleted = true;
+           
 
             LevelModifier activeModifier = null;
 
@@ -148,18 +180,59 @@ public class PuzzleGridManager : MonoBehaviour
                 activeModifier = levelManager.GetActiveModifier();
             }
 
-            int perkBonus = ScoreManager.Instance.GetModifierBonus(activeModifier);
-            int totalPoints = nodeBasePoints + perkBonus;
+            if (ScoreManager.Instance == null)
+            {
+                Debug.LogError("ScoreManager instance not found.");
+            }
+            else
+            {
+                LevelDifficulty difficulty =
+                    LevelTransferData.SelectedDifficulty;
+
+                int basePoints =
+                    ScoreManager.Instance.GetBasePoints(difficulty);
+
+                int perkBonus =
+                    ScoreManager.Instance.GetModifierBonus(activeModifier);
+
+                int totalPoints = basePoints + perkBonus;
+
+                ScoreManager.Instance.AddPoints(totalPoints);
+
+                Debug.Log(
+                    $"Level complete! " +
+                    $"Difficulty: {difficulty}, " +
+                    $"Base: {basePoints}, " +
+                    $"Perk Bonus: {perkBonus}, " +
+                    $"Total: {totalPoints}"
+                );
+            }
 
 
-            ScoreManager.Instance.AddPoints(totalPoints);
-
-            Debug.Log($"Level complete! Base: {nodeBasePoints}, Perk Bonus: {perkBonus}, Total: {totalPoints}");
-            GameStateManager.Instance.CompleteLevel(levelID, PlayerProfile.Instance.PlayerColor);
-            SceneManager.LoadScene("PathSelection");
+            if (IsComplete())
+            {
+                FinishLevel();
+            }
         }
 
         return true;
+    }
+
+    public void RemovePiece(Piece piece, Vector3 worldPosition)
+    {
+        Vector2Int origin = WorldToGrid(worldPosition);
+
+        foreach (Vector2Int offset in piece.GetRotatedShape())
+        {
+            Vector2Int cellPosition = origin + offset;
+
+            if (IsInsideGrid(cellPosition))
+            {
+                cells[cellPosition.x, cellPosition.y].SetOccupied(false);
+            }
+        }
+
+        ClearHover();
     }
 
     public void UpdateHover(Piece piece, Vector3 worldPosition)
@@ -185,7 +258,8 @@ public class PuzzleGridManager : MonoBehaviour
     {
         foreach (Cell cell in currentHoverCells)
         {
-            cell.SetHover(false);
+            if (cell != null)
+                cell.SetHover(false);
         }
 
         currentHoverCells.Clear();
@@ -202,16 +276,96 @@ public class PuzzleGridManager : MonoBehaviour
             }
         }
 
-        Debug.Log("Puzzle complete!");
-        // Back to Pathchoosing
         return true;
+    }
+
+    public void ApplyModifier(LevelModifier modifier)
+    {
+        if (modifier == null ||
+            modifier.type != LevelModifierType.FixedStartingPiece ||
+            modifier.fixedPiecePrefab == null)
+        {
+            return;
+        }
+
+        Vector3 spawnPosition = GridToWorld(modifier.fixedPiecePosition);
+
+        Piece fixedPiece = Instantiate(
+            modifier.fixedPiecePrefab,
+            spawnPosition,
+            Quaternion.identity
+        );
+
+        fixedPiece.transform.localScale = Vector3.one * cellSize;
+
+        if (!TryPlacePiece(fixedPiece, spawnPosition))
+        {
+            Debug.LogWarning("Das feste Startteil konnte nicht platziert werden.");
+            Destroy(fixedPiece.gameObject);
+        }
+    }
+
+    private void AwardLevelPoints()
+    {
+
+        LevelModifier activeModifier = null;
+
+        if (levelManager != null)
+        {
+            activeModifier = levelManager.GetActiveModifier();
+        }
+
+        if (ScoreManager.Instance == null)
+        {
+            Debug.LogError("ScoreManager instance not found.");
+            return;
+        }
+
+        LevelDifficulty difficulty = LevelTransferData.SelectedDifficulty;
+
+        int basePoints =
+            ScoreManager.Instance.GetBasePoints(difficulty);
+
+        int perkBonus =
+            ScoreManager.Instance.GetModifierBonus(activeModifier);
+
+        int totalPoints = basePoints + perkBonus;
+
+        ScoreManager.Instance.AddPoints(totalPoints);
+
+        Debug.Log(
+            $"Level complete! Difficulty: {difficulty}, " +
+            $"Base: {basePoints}, Perk Bonus: {perkBonus}, " +
+            $"Total: {totalPoints}"
+        );
+    }
+
+    private void CompleteLevel()
+    {
+        Debug.Log("Level complete!");
+
+        GameStateManager.Instance.CompleteLevel(
+            levelID,
+            PlayerProfile.Instance.PlayerColor
+        );
+
+        SceneManager.LoadScene("PathSelection");
     }
 
     public void InstantCompleteLevel()
     {
-        Debug.Log("Level complete!");
-        GameStateManager.Instance.CompleteLevel(levelID, PlayerProfile.Instance.PlayerColor);
-        SceneManager.LoadScene("PathSelection");
+        FinishLevel();
     }
 
+    private void FinishLevel()
+    {
+        if (levelCompleted)
+            return;
+
+       
+        levelCompleted = true;
+
+        AwardLevelPoints();
+        CompleteLevel();
+    }
 }

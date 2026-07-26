@@ -14,6 +14,10 @@ public class LevelModifier : ScriptableObject
     public string displayName;
     public LevelModifierType type;
 
+    [Header("Score")]
+    [Min(0)]
+    public int scoreBonus;
+
     [Header("Piece Category Bias")]
     public PieceCategory[] preferredCategories;
     public int categoryMultiplier = 4;

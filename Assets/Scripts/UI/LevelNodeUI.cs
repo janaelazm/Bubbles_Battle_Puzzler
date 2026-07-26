@@ -26,14 +26,47 @@ public class LevelNodeUI : MonoBehaviour
 
     public void EnterLevel()
     {
-        LevelNode currentNode =
-            FindAnyObjectByType<PathManager>().GetCurrentNode();
+        PathManager pathManager = FindAnyObjectByType<PathManager>();
+
+        if (pathManager == null)
+        {
+            Debug.LogError("PathManager not found.");
+            return;
+        }
+
+        if (nodeData == null)
+        {
+            Debug.LogError($"No nodeData assigned to {gameObject.name}.");
+            return;
+        }
+
+        LevelNode currentNode = pathManager.GetCurrentNode();
+
+        if (currentNode == null)
+        {
+            Debug.LogError("Current node is null.");
+            return;
+        }
+
+        if (currentNode.Connections == null)
+        {
+            Debug.LogError(
+                $"Connections are null for current node {currentNode.LevelID}."
+            );
+            return;
+        }
 
         if (!currentNode.Connections.Contains(nodeData))
             return;
 
         if (nodeData.LevelID == 0)
             return;
+
+        if (GameStateManager.Instance == null)
+        {
+            Debug.LogError("GameStateManager instance not found.");
+            return;
+        }
 
         if (GameStateManager.Instance.GameEnded.Value)
             return;
@@ -44,8 +77,17 @@ public class LevelNodeUI : MonoBehaviour
             return;
         }
 
-        if(nodeData.State == LevelState.Completed || nodeData.State == LevelState.Occupied)
-            return ;
+        if (nodeData.State == LevelState.Completed ||
+            nodeData.State == LevelState.Occupied)
+        {
+            return;
+        }
+
+        if (PlayerProfile.Instance == null)
+        {
+            Debug.LogError("PlayerProfile instance not found.");
+            return;
+        }
 
         GameStateManager.Instance.OccupyLevel(
             nodeData.LevelID,
@@ -53,12 +95,17 @@ public class LevelNodeUI : MonoBehaviour
         );
 
         LevelTransferData.SelectedLevelID = nodeData.LevelID;
+        LevelTransferData.SelectedDifficulty = nodeData.Difficulty;
+        LevelTransferData.SelectedModifier = nodeData.Modifier;
+
         SceneManager.LoadScene(nodeData.LevelName);
     }
 
     public void SetState(LevelState state, Color color)
     {
-        nodeData.State = state;
+        if (nodeData != null)
+            nodeData.State = state;
+            
         switch (state)
         {
 

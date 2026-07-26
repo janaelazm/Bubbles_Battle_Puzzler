@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
@@ -5,64 +7,104 @@ using UnityEngine;
 
 public class LobbyManager : MonoBehaviour
 {
-   /* [SerializeField] private Authenticator authenticator;
+    [SerializeField] private Authenticator authenticator;
     [SerializeField] private RelayManager relayManager;
+
+    public event Action<string> OnLobbyStatusChanged;
+
 
     public async void QuickPlay()
     {
-        Lobby lobby = await FindAvailableLobby();
+        try
+        {
+            OnLobbyStatusChanged?.Invoke("Searching for players...");
 
-        if (lobby != null)
-        {
-            await JoinLobby(lobby);
+            Lobby lobby = await FindAvailableLobby();
+
+            if (lobby != null)
+            {
+                await JoinLobby(lobby);
+            }
+            else
+            {
+                await CreateLobby();
+            }
         }
-        else
+        catch (Exception e)
         {
-            await CreateLobby();
+            Debug.LogException(e);
+            OnLobbyStatusChanged?.Invoke("Lobby failed.");
         }
     }
+
 
     private async Task CreateLobby()
     {
         string playerName = PlayerProfile.Instance.PlayerName;
-        string playerId = authenticator.GetPlayerId();
+        OnLobbyStatusChanged?.Invoke("Creating lobby...");
+        // Create relay first
+        string relayCode = await relayManager.StartHost();
+        CreateLobbyOptions options = new CreateLobbyOptions
+        {
+            Player = new Player
+            {
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    {
+                        "PlayerName",
+                        new PlayerDataObject(
+                            PlayerDataObject.VisibilityOptions.Member,
+                            playerName
+                        )
+                    }
+                }
+            },
 
-        // store relay join code inside lobby
-        string joinCode = await relayManager.StartHost();
+            Data = new Dictionary<string, DataObject>
+            {
+                {
+                    "RelayCode",
+                    new DataObject(
+                        DataObject.VisibilityOptions.Member,
+                        relayCode
+                    )
+                }
+            }
+        };
+
 
         Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(
-            joinCode,
-            2
-            TODO LATER
-            playerData:
-            {
-                "PlayerName": playerName,
-                "PlayerId": playerId
-            }
+            "Quick Play Lobby",
+            2,
+            options
         );
 
+
+        Debug.Log("Lobby created: " + lobby.Id);
+
+        OnLobbyStatusChanged?.Invoke("Waiting for player...");
     }
 
-   private async Task JoinLobby(Lobby lobby)
-   {
+
+    private async Task JoinLobby(Lobby lobby)
+    {
+        OnLobbyStatusChanged?.Invoke("Joining lobby...");
         Lobby joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Id);
+        string relayCode = joinedLobby.Data["RelayCode"].Value;
 
-        string joinCode = joinedLobby.Data["RelayCode"].Value;
-
-        await relayManager.StartClient(joinCode);
-
-        Debug.Log("Joined lobby");
+        Debug.Log("Relay code: " + relayCode);
+        await relayManager.StartClient(relayCode);
+        OnLobbyStatusChanged?.Invoke("Connected!");
     }
+
 
     private async Task<Lobby> FindAvailableLobby()
     {
         QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync();
-
         if (response.Results.Count > 0)
         {
             return response.Results[0];
         }
-
         return null;
-    }*/
+    }
 }
