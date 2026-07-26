@@ -61,6 +61,7 @@ public class Piece : MonoBehaviour
     {
         transform.position = startPosition;
         IsDragging = false;
+        IsPlaced = false;
     }
 
     public void SetRandomRotation()
