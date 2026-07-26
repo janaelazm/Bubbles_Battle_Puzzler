@@ -32,12 +32,12 @@ public class PieceMovement : MonoBehaviour
         gridManager.UpdateHover(piece, transform.position);
     }
 
-    /* public void BeginDrag()
+    public void BeginDrag()
     {
         if (piece.IsDragging)
             return;
 
-        Debug.Log($"Angeklickt: {name}, IsPlaced: {piece.IsPlaced}");
+        Debug.Log($"BeginDrag: {name}, IsPlaced: {piece.IsPlaced}");
 
         Vector3 mousePosition = GetMouseWorldPosition();
         offset = transform.position - mousePosition;
@@ -48,7 +48,11 @@ public class PieceMovement : MonoBehaviour
         {
             previousPlacedPosition = transform.position;
 
-            gridManager.RemovePiece(piece, previousPlacedPosition);
+            gridManager.RemovePiece(
+                piece,
+                previousPlacedPosition
+            );
+
             piece.PickUpFromGrid();
         }
         else
@@ -75,9 +79,9 @@ public class PieceMovement : MonoBehaviour
         }
 
         wasPlacedWhenPickedUp = false;
-    } */
+    }
 
-    private void OnMouseDown()
+    /* private void OnMouseDown()
     {
 
         Debug.Log($"Angeklickt: {name}, IsPlaced: {piece.IsPlaced}");
@@ -122,7 +126,7 @@ public class PieceMovement : MonoBehaviour
         }
 
         wasPlacedWhenPickedUp = false;
-    }
+    } */
 
     private void HandlePreviouslyPlacedPiece()
     {
