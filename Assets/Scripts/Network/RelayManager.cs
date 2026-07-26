@@ -19,20 +19,24 @@ public class RelayManager : MonoBehaviour
         {
             OnStatusChanged?.Invoke("Generating room...");
 
+            string connectionType;
+            var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+
+#if UNITY_WEBGL
+            transport.UseWebSockets = true;
+            connectionType = "wss";
+#else
+            transport.UseWebSockets = false;
+            connectionType = "dtls";
+#endif
+
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(4);
 
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
-            Debug.Log("JOIN CODE: " + joinCode);
 
-            var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-
-            transport.SetHostRelayData(
-                allocation.RelayServer.IpV4,
-                (ushort)allocation.RelayServer.Port,
-                allocation.AllocationIdBytes,
-                allocation.Key,
-                allocation.ConnectionData
+            transport.SetRelayServerData(
+                AllocationUtils.ToRelayServerData(allocation, connectionType)
             );
 
             NetworkManager.Singleton.StartHost();
@@ -71,17 +75,22 @@ public class RelayManager : MonoBehaviour
         {
             OnStatusChanged?.Invoke("Joining room...");
 
-            JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode.Trim());
-
+            string connectionType;
             var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
-            transport.SetClientRelayData(
-                allocation.RelayServer.IpV4,
-                (ushort)allocation.RelayServer.Port,
-                allocation.AllocationIdBytes,
-                allocation.Key,
-                allocation.ConnectionData,
-                allocation.HostConnectionData
+#if UNITY_WEBGL
+            transport.UseWebSockets = true;
+            connectionType = "wss";
+#else
+            transport.UseWebSockets = false;
+            connectionType = "dtls";
+#endif
+
+            JoinAllocation allocation =
+                await RelayService.Instance.JoinAllocationAsync(joinCode.Trim());
+
+            transport.SetRelayServerData(
+                AllocationUtils.ToRelayServerData(allocation, connectionType)
             );
 
             NetworkManager.Singleton.StartClient();
