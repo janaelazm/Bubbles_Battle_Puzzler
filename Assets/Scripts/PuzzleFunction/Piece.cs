@@ -12,6 +12,8 @@ public class Piece : MonoBehaviour
     private Vector3 startPosition;
     public int RotationSteps { get; private set; }
 
+    public bool ShouldDespawnOnRelease { get; set; }
+
     [SerializeField] private PieceCategory[] categories;
     public PieceCategory[] Categories => categories;
 

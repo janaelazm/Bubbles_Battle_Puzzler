@@ -160,11 +160,26 @@ public class PieceSpawner : MonoBehaviour
                 continue;
             }
 
-            if (!piece.IsPlaced)
+            // Platzierte Pieces bleiben bestehen.
+            if (piece.IsPlaced)
             {
-                Destroy(piece.gameObject);
+                currentPieces.RemoveAt(i);
+                continue;
             }
 
+            // Gerade gehaltene Pieces nicht sofort löschen.
+            // Sie werden beim Loslassen entfernt,
+            // falls sie bis dahin nicht platziert wurden.
+            if (piece.IsDragging)
+            {
+                piece.ShouldDespawnOnRelease = true;
+                currentPieces.RemoveAt(i);
+                continue;
+            }
+
+            // Nicht platziert und nicht in der Hand:
+            // sofort löschen.
+            Destroy(piece.gameObject);
             currentPieces.RemoveAt(i);
         }
     }
