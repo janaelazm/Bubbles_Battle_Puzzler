@@ -136,7 +136,6 @@ public class PieceMovement : MonoBehaviour
             return;
         }
 
-        // Das Piece darf nicht an eine andere Stelle verschoben werden.
         bool returnedSuccessfully = gridManager.TryPlacePiece(
             piece,
             previousPlacedPosition
@@ -159,10 +158,19 @@ public class PieceMovement : MonoBehaviour
             transform.position
         );
 
-        if (!placedSuccessfully)
+        if (placedSuccessfully)
         {
-            piece.ResetToStart();
+            piece.ShouldDespawnOnRelease = false;
+            return;
         }
+
+        if (piece.ShouldDespawnOnRelease)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        piece.ResetToStart();
     }
 
     private bool IsPointerOverDeleteZone()
