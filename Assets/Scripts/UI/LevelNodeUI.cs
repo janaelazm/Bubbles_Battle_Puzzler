@@ -71,7 +71,7 @@ public class LevelNodeUI : MonoBehaviour
         if (GameStateManager.Instance.GameEnded.Value)
             return;
 
-        if (nodeData.LevelID == 10)
+        if (nodeData.IsEndNode)
         {
             GameStateManager.Instance.ReachEnd();
             return;
@@ -101,26 +101,62 @@ public class LevelNodeUI : MonoBehaviour
         SceneManager.LoadScene(nodeData.LevelName);
     }
 
-    public void SetState(LevelState state, Color color)
-    {
-        if (nodeData != null)
-            nodeData.State = state;
-            
-        switch (state)
-        {
-
-            case LevelState.Occupied:
-                image.color = color;
-                break;
-
-            case LevelState.Completed:
-                image.color = new Color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f);
-                break;
-        }
-    }
+    private Color difficultyColor = Color.white;
+    private Color currentColor = Color.white;
+    private bool isDimmed;
 
     public void SetDifficultyColor(Color color)
     {
-        image.color = color;
+        difficultyColor = color;
+        currentColor = color;
+
+        RefreshColor();
+    }
+
+    public void SetState(LevelState state, Color playerColor)
+    {
+        if (nodeData != null)
+            nodeData.State = state;
+
+        switch (state)
+        {
+            case LevelState.Available:
+                currentColor = difficultyColor;
+                break;
+
+            case LevelState.Occupied:
+                currentColor = playerColor;
+                break;
+
+            case LevelState.Completed:
+                currentColor = new Color(
+                    playerColor.r * 0.5f,
+                    playerColor.g * 0.5f,
+                    playerColor.b * 0.5f,
+                    playerColor.a
+                );
+                break;
+        }
+
+        RefreshColor();
+    }
+
+    public void SetDimmed(bool dimmed)
+    {
+        isDimmed = dimmed;
+        levelButton.interactable = !dimmed;
+
+        RefreshColor();
+    }
+
+    private void RefreshColor()
+    {
+        Color visibleColor = currentColor;
+
+        visibleColor.a = isDimmed
+            ? 0.97f
+            : 1f;
+
+        image.color = visibleColor;
     }
 }

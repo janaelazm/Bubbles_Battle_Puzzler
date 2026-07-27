@@ -16,7 +16,7 @@ public class GameInit : MonoBehaviour
             await authenticator.Init();
             PlayerProfile.Instance.Load();
             netowrkUI.InitNetworkUI();
-            playerProfileUI.initPlayerUI();
+            playerProfileUI.InitPlayerUI();
         }
         catch (Exception e)
         {

@@ -23,6 +23,13 @@ public class PathManager : MonoBehaviour
     {
         levels = GetComponentsInChildren<LevelNodeUI>()
             .ToList();
+
+        for (int i = 0; i < levels.Count; i++)
+        {
+            Debug.Log(
+                $"Index {i} = {levels[i].gameObject.name}"
+            );
+        }
     }
 
     private void OnEnable()
@@ -44,7 +51,7 @@ public class PathManager : MonoBehaviour
 
         SubscribeToGameStateManager();
 
-        
+
         if (GameStateManager.Instance.IsServer &&
             !GameStateManager.Instance.HasLevelModifiers(
                 levels.Count))
@@ -56,7 +63,7 @@ public class PathManager : MonoBehaviour
                 .InitializeLevelModifiers(modifierIndices);
         }
 
-       
+
         TryInitializePath();
     }
 
@@ -140,6 +147,8 @@ public class PathManager : MonoBehaviour
 
         GameStateManager.Instance.RegisterPath(levels);
 
+        UpdateNodeVisuals();
+
         Debug.Log(
             "Path initialized with synchronized modifiers."
         );
@@ -162,23 +171,67 @@ public class PathManager : MonoBehaviour
         return modifierIndices;
     }
 
+    /// <summary>
+    /// Get the difficulty for a given node ID based on its position in the path.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     private LevelDifficulty GetDifficultyForNode(int id)
     {
-        int difficultyPosition = (id - 1) % 3;
 
-        switch (difficultyPosition)
+        return id switch
         {
-            case 0:
-                return LevelDifficulty.Easy;
+            1 => LevelDifficulty.Easy,
+            2 => LevelDifficulty.Medium,
+            3 => LevelDifficulty.Hard,
 
-            case 1:
-                return LevelDifficulty.Medium;
+            4 => LevelDifficulty.Medium,
+            5 => LevelDifficulty.Easy,
+            6 => LevelDifficulty.Hard,
 
-            case 2:
-                return LevelDifficulty.Hard;
+            7 => LevelDifficulty.Hard,
+            8 => LevelDifficulty.Easy,
+            9 => LevelDifficulty.Medium,
 
-            default:
-                return LevelDifficulty.Placeholder;
+            10 => LevelDifficulty.Medium,
+            11 => LevelDifficulty.Medium,
+            12 => LevelDifficulty.Easy,
+
+            _ => LevelDifficulty.Placeholder
+        };
+    }
+
+    private void UpdateNodeVisuals()
+    {
+        LevelNode currentNode = GetCurrentNode();
+
+        if (currentNode == null)
+            return;
+
+        foreach (LevelNodeUI nodeUI in levels)
+        {
+            LevelNode node = nodeUI.nodeData;
+
+            if (node == null)
+                continue;
+
+            bool isSelectable =
+                currentNode.Connections.Contains(node);
+
+            bool isCurrentNode =
+                node == currentNode;
+
+            bool isFinished =
+                node.State == LevelState.Completed;
+
+            if (isSelectable || isCurrentNode || isFinished)
+            {
+                nodeUI.SetDimmed(false);
+            }
+            else
+            {
+                nodeUI.SetDimmed(true);
+            }
         }
     }
 
@@ -258,67 +311,73 @@ public class PathManager : MonoBehaviour
 
     private void CreateNodes()
     {
-        int id = 1;
-
         CreateNode(
             0,
             0,
-            LevelDifficulty.Placeholder,
-            Color.gray
+            LevelDifficulty.Placeholder
         );
 
-        for (int floor = 1; floor <= 3; floor++)
+        for (int id = 1; id <= 12; id++)
         {
-            CreateNode(
-                id++,
-                floor,
-                LevelDifficulty.Easy,
-                new Color(
-                    78f / 255f,
-                    242f / 255f,
-                    163f / 255f,
-                    1f
-                )
-            );
+            int floor = ((id - 1) / 3) + 1;
+
+            LevelDifficulty difficulty =
+                GetDifficultyForNode(id);
 
             CreateNode(
-                id++,
+                id,
                 floor,
-                LevelDifficulty.Medium,
-                new Color(
-                    237f / 255f,
-                    225f / 255f,
-                    116f / 255f,
-                    1f
-                )
-            );
-
-            CreateNode(
-                id++,
-                floor,
-                LevelDifficulty.Hard,
-                new Color(
-                    214f / 255f,
-                    81f / 255f,
-                    132f / 255f,
-                    1f
-                )
+                difficulty
             );
         }
 
         CreateNode(
-            10,
-            4,
+            13,
+            5,
             LevelDifficulty.Placeholder,
-            Color.gray
+            true
         );
+    }
+
+    private Color GetColorForDifficulty(
+    LevelDifficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case LevelDifficulty.Easy:
+                return new Color(
+                    78f / 255f,
+                    242f / 255f,
+                    163f / 255f,
+                    1f
+                );
+
+            case LevelDifficulty.Medium:
+                return new Color(
+                    237f / 255f,
+                    225f / 255f,
+                    116f / 255f,
+                    1f
+                );
+
+            case LevelDifficulty.Hard:
+                return new Color(
+                    214f / 255f,
+                    81f / 255f,
+                    132f / 255f,
+                    1f
+                );
+
+            default:
+                return Color.gray;
+        }
     }
 
     private void CreateNode(
         int id,
         int floor,
         LevelDifficulty difficulty,
-        Color color)
+        bool isEndNode = false)
     {
         int modifierIndex =
             GameStateManager.Instance
@@ -335,11 +394,12 @@ public class PathManager : MonoBehaviour
             "PuzzleScene",
             floor,
             difficulty,
-            modifier
+            modifier,
+            isEndNode
         );
 
         levels[id].SetNodeData(node);
-        levels[id].image.color = color;
+        levels[id].SetDifficultyColor(GetColorForDifficulty(difficulty));
 
         Debug.Log(
             modifier == null
@@ -362,43 +422,46 @@ public class PathManager : MonoBehaviour
         {
             levels[index].SetState(state, color);
         }
+
+        UpdateNodeVisuals();
     }
 
     private void CreateConnections()
     {
+        // Start > Ebene 1
         Connect(0, 1);
         Connect(0, 2);
         Connect(0, 3);
 
-        // Floor 1 -> Floor 2
+        // Ebene 1 > Ebene 2
         Connect(1, 4);
         Connect(1, 5);
-        Connect(1, 6);
 
         Connect(2, 4);
         Connect(2, 5);
-        Connect(2, 6);
 
-        Connect(3, 4);
-        Connect(3, 5);
         Connect(3, 6);
 
-        // Floor 2 -> Floor 3
+        // Ebene 2 > Ebene 3
         Connect(4, 7);
-        Connect(4, 8);
-        Connect(4, 9);
 
-        Connect(5, 7);
         Connect(5, 8);
-        Connect(5, 9);
 
-        Connect(6, 7);
-        Connect(6, 8);
         Connect(6, 9);
 
+        // Ebene 3 > Ebene 4
         Connect(7, 10);
-        Connect(8, 10);
-        Connect(9, 10);
+
+        Connect(8, 11);
+        Connect(8, 12);
+
+        Connect(9, 11);
+        Connect(9, 12);
+
+        // Ebene 4 > Ende
+        Connect(10, 13);
+        Connect(11, 13);
+        Connect(12, 13);
     }
 
     private void Connect(int a, int b)
