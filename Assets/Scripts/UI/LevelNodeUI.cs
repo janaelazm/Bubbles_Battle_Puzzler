@@ -1,13 +1,18 @@
+using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LevelNodeUI : MonoBehaviour
+public class LevelNodeUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Button levelButton;
     [SerializeField] public Image image;
     [SerializeField] private TextMeshProUGUI text;
+    [SerializeField] private GameObject tooltipPanel;
+    [SerializeField] private TextMeshProUGUI tooltipText;
     public LevelNode nodeData;
 
     public void SetNodeData(LevelNode data)
@@ -18,10 +23,53 @@ public class LevelNodeUI : MonoBehaviour
 
     void Awake()
     {
-        levelButton = GetComponent<Button>();
-        image = GetComponent<Image>();
-        text = GetComponentInChildren<TextMeshProUGUI>();
+        tooltipPanel.SetActive(false);
         Debug.Log(gameObject.name + " TEXT: " + text);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (nodeData == null || nodeData.Modifier == null)
+        {
+            tooltipPanel.SetActive(false);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(nodeData.Modifier.displayName))
+        {
+            tooltipPanel.SetActive(false);
+            return;
+        }
+
+        tooltipText.text = nodeData.Modifier.displayName;
+        tooltipPanel.SetActive(true);
+    }
+
+    private string GetModifierDescription(LevelModifier modifier)
+    {
+        string modifierName = modifier.ToString();
+
+        string difficulty = "";
+        string type = "";
+
+        if (modifierName.Contains("Green"))
+            difficulty = "Easy";
+        else if (modifierName.Contains("Yellow"))
+            difficulty = "Medium";
+        else if (modifierName.Contains("Red"))
+            difficulty = "Hard";
+
+        if (modifierName.Contains("Small"))
+            type = "Small";
+        else if (modifierName.Contains("Diagonal"))
+            type = "Diagonal";
+
+        return $"{difficulty} {type}";
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        tooltipPanel.SetActive(false);
     }
 
     public void EnterLevel()

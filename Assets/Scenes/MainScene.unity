@@ -1016,10 +1016,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da65c0b24323b254082e30fbba3454af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProfileUI
-  playerNameText: {fileID: 0}
-  nameEditButton: {fileID: 0}
-  nameEditField: {fileID: 0}
-  avatar: {fileID: 0}
+  playerNameText: {fileID: 801766905}
+  nameEditButton: {fileID: 1361716115}
+  nameEditField: {fileID: 1847170543}
+  avatar: {fileID: 1147003208}
 --- !u!114 &497095690
 MonoBehaviour:
   m_ObjectHideFlags: 0
