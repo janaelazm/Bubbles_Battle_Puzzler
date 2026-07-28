@@ -1,6 +1,7 @@
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameEndUI : MonoBehaviour
 {
@@ -9,6 +10,15 @@ public class GameEndUI : MonoBehaviour
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private TMP_Text localScoreText;
     [SerializeField] private TMP_Text opponentScoreText;
+    [SerializeField] private Image backgroundImage;
+
+    [Header("Result Backgrounds")]
+    [SerializeField] private Sprite winBackground;
+    [SerializeField] private Sprite loseBackground;
+
+    [Header("Result Texts")]
+    [SerializeField] private string winText = "YOU WIN!";
+    [SerializeField] private string loseText = "YOU LOSE!";
 
     private void Start()
     {
@@ -71,7 +81,8 @@ public class GameEndUI : MonoBehaviour
 
         if (localScoreText != null)
         {
-            localScoreText.text = $"Your score: {localScore}";
+            localScoreText.text =
+                $"Your score: {localScore}";
         }
 
         if (opponentScoreText != null)
@@ -80,34 +91,52 @@ public class GameEndUI : MonoBehaviour
                 $"Opponent score: {opponentScore}";
         }
 
-        if (resultText != null)
+        bool isWinner =
+            localClientId ==
+            GameStateManager.Instance.WinnerClientId.Value;
+
+        if (isWinner)
         {
-            if (GameStateManager.Instance.IsDraw.Value)
-            {
-                resultText.text = "DRAW";
-            }
-            else if (
-                localClientId ==
-                GameStateManager.Instance.WinnerClientId.Value
-            )
-            {
-                resultText.text = "YOU WIN!";
-            }
-            else
-            {
-                resultText.text = "YOU LOSE!";
-            }
+            ApplyResultVisuals(
+                winText,
+                winBackground
+            );
+        }
+        else
+        {
+            ApplyResultVisuals(
+                loseText,
+                loseBackground
+            );
         }
 
         if (endPanel != null)
         {
             endPanel.SetActive(true);
+            endPanel.transform.SetAsLastSibling();
         }
 
         Debug.Log(
             $"Final result displayed. " +
             $"Local: {localScore}, Opponent: {opponentScore}"
         );
+    }
+
+    private void ApplyResultVisuals(
+        string message,
+        Sprite background
+    )
+    {
+        if (resultText != null)
+        {
+            resultText.text = message;
+        }
+
+        if (backgroundImage != null &&
+            background != null)
+        {
+            backgroundImage.sprite = background;
+        }
     }
 
     private void OnDestroy()
