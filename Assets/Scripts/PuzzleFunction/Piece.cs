@@ -91,4 +91,14 @@ public class Piece : MonoBehaviour
         return rotatedShape;
     }
 
+    private void OnMouseDown()
+    {
+        AudioManager.Instance.PlayClick();
+    }
+
+    private void OnMouseUp()
+    {
+        AudioManager.Instance.PlayRelease();
+    }
+
 }
