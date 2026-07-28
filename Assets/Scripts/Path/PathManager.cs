@@ -346,25 +346,25 @@ public class PathManager : MonoBehaviour
         {
             case LevelDifficulty.Easy:
                 return new Color(
-                    78f / 255f,
-                    242f / 255f,
-                    163f / 255f,
+                    0f / 255f,
+                    168f / 255f,
+                    232f / 255f,
                     1f
                 );
 
             case LevelDifficulty.Medium:
                 return new Color(
-                    237f / 255f,
-                    225f / 255f,
-                    116f / 255f,
+                    245f / 255f,
+                    197f / 255f,
+                    24f / 255f,
                     1f
                 );
 
             case LevelDifficulty.Hard:
                 return new Color(
-                    214f / 255f,
-                    81f / 255f,
-                    132f / 255f,
+                    130f / 255f,
+                    32f / 255f,
+                    74f / 255f,
                     1f
                 );
 
