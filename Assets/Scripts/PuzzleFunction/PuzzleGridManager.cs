@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 public class PuzzleGridManager : MonoBehaviour
 {
     [Header("Grid Settings")]
-    [SerializeField] private int width = 8;
-    [SerializeField] private int height = 8;
+    [SerializeField] private int width = 7;
+    [SerializeField] private int height = 7;
     [SerializeField] private BoxCollider2D puzzleArea;
 
     [Header("Level Node Details")]

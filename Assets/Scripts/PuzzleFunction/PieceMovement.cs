@@ -37,8 +37,6 @@ public class PieceMovement : MonoBehaviour
         if (piece.IsDragging)
             return;
 
-        Debug.Log($"BeginDrag: {name}, IsPlaced: {piece.IsPlaced}");
-
         Vector3 mousePosition = GetMouseWorldPosition();
         offset = transform.position - mousePosition;
 
@@ -57,6 +55,18 @@ public class PieceMovement : MonoBehaviour
         }
         else
         {
+            FloatingPiece floatingPiece =
+                GetComponent<FloatingPiece>();
+
+            if (floatingPiece != null)
+            {
+                floatingPiece.RemoveFromRiver();
+
+                // Ein aus dem Fluss genommenes Piece wird gelöscht,
+                // wenn es nicht erfolgreich platziert wird.
+                piece.ShouldDespawnOnRelease = true;
+            }
+
             piece.StartDragging();
         }
     }
@@ -159,18 +169,9 @@ public class PieceMovement : MonoBehaviour
         );
 
         if (placedSuccessfully)
-        {
-            piece.ShouldDespawnOnRelease = false;
             return;
-        }
 
-        if (piece.ShouldDespawnOnRelease)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        piece.ResetToStart();
+        Destroy(gameObject);
     }
 
     private bool IsPointerOverDeleteZone()
