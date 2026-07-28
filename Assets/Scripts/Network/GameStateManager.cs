@@ -50,8 +50,8 @@ public class GameStateManager : NetworkBehaviour
     private int localScore;
 
     public int LocalScore => localScore;
-    [SerializeField] private GameObject gameEndUIPrefab;
-    private GameObject gameEndUIInstance;
+    // [SerializeField] private GameObject gameEndUIPrefab;
+    // private GameObject gameEndUIInstance;
 
     public NetworkList<PlayerScoreEntry> PlayerScores = new NetworkList<PlayerScoreEntry>();
     public NetworkList<int> levelModifierIndices = new NetworkList<int>();
@@ -278,7 +278,7 @@ public class GameStateManager : NetworkBehaviour
         if (!newValue)
             return;
 
-        SpawnEndUI();
+        // SpawnEndUI();
 
         if (IsDraw.Value)
         {
@@ -376,7 +376,7 @@ public class GameStateManager : NetworkBehaviour
 
 
 
-    private void SpawnEndUI()
+/*     private void SpawnEndUI()
     {
         if (gameEndUIInstance != null)
             return;
@@ -384,7 +384,7 @@ public class GameStateManager : NetworkBehaviour
         gameEndUIInstance = Instantiate(gameEndUIPrefab);
 
         DontDestroyOnLoad(gameEndUIInstance);
-    }
+    } */
 
     private void SetPlayerScoreOnServer(
     ulong clientId,
