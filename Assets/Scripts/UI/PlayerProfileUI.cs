@@ -4,30 +4,70 @@ using UnityEngine.UI;
 
 public class PlayerProfileUI : MonoBehaviour
 {
-    [SerializeField] private TMP_Text playerName;
-    [SerializeField] private Button NameEditButton;
-    [SerializeField] private TMP_InputField NameEditField;
-    [SerializeField] private Image Avatar;
+    [SerializeField] private TMP_Text playerNameText;
+    [SerializeField] private Button nameEditButton;
+    [SerializeField] private TMP_InputField nameEditField;
+    [SerializeField] private Image avatar;
 
-    public void ChangeName()
+    private void Start()
     {
-        string newName = NameEditField.text;
+        InitPlayerUI();
 
-        if (string.IsNullOrWhiteSpace(newName))
-            return;
+        nameEditField.onSubmit.AddListener(ChangeName);
+        nameEditField.onEndEdit.AddListener(OnNameEditEnded);
+    }
 
-        PlayerProfile.Instance.SetName(newName);
-
-        playerName.text = "Hello, " + PlayerProfile.Instance.PlayerName + "!";
-
-        NameEditField.gameObject.SetActive(false);
+    private void OnDestroy()
+    {
+        nameEditField.onSubmit.RemoveListener(ChangeName);
+        nameEditField.onEndEdit.RemoveListener(OnNameEditEnded);
     }
 
     public void OpenNameField()
     {
-        NameEditField.gameObject.SetActive(true);
-        NameEditField.Select();
-        NameEditField.ActivateInputField();
+        if (PlayerProfile.Instance == null)
+            return;
+
+        playerNameText.gameObject.SetActive(false);
+        nameEditField.gameObject.SetActive(true);
+
+        nameEditField.text = PlayerProfile.Instance.PlayerName;
+
+        nameEditField.Select();
+        nameEditField.ActivateInputField();
+
+        nameEditField.caretPosition = nameEditField.text.Length;
+        nameEditField.selectionAnchorPosition = nameEditField.text.Length;
+        nameEditField.selectionFocusPosition = nameEditField.text.Length;
+    }
+
+    private void ChangeName(string newName)
+    {
+        SaveAndCloseNameField(newName);
+    }
+
+    private void OnNameEditEnded(string newName)
+    {
+        SaveAndCloseNameField(newName);
+    }
+
+    private void SaveAndCloseNameField(string newName)
+    {
+        newName = newName.Trim();
+
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            PlayerProfile.Instance.SetName(newName);
+            UpdateNameText();
+        }
+
+        nameEditField.gameObject.SetActive(false);
+        playerNameText.gameObject.SetActive(true);
+    }
+
+    private void UpdateNameText()
+    {
+        playerNameText.text = PlayerProfile.Instance.PlayerName;
     }
 
     public void InitPlayerUI()
@@ -35,16 +75,12 @@ public class PlayerProfileUI : MonoBehaviour
         if (PlayerProfile.Instance == null)
             return;
 
-        playerName.text =
-            "Hello, " + PlayerProfile.Instance.PlayerName + "!";
+        UpdateNameText();
 
-        NameEditButton.gameObject.SetActive(true);
-        NameEditField.gameObject.SetActive(false);
+        playerNameText.gameObject.SetActive(true);
+        nameEditButton.gameObject.SetActive(true);
+        nameEditField.gameObject.SetActive(false);
 
-        NameEditButton.image.color =
-            PlayerProfile.Instance.PlayerColor;
-
-        Avatar.color =
-            PlayerProfile.Instance.PlayerColor;
+        avatar.color = PlayerProfile.Instance.PlayerColor;
     }
 }
